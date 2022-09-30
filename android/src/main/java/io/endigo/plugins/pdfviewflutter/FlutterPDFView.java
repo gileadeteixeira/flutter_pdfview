@@ -1,6 +1,7 @@
 package io.endigo.plugins.pdfviewflutter;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.view.View;
 import android.net.Uri;
 
@@ -23,6 +24,29 @@ import com.github.barteksc.pdfviewer.util.FitPolicy;
 
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 
+class CustomPDFView extends PDFView {
+    boolean enableRecycle = true;
+
+    public CustomPDFView(Context context, AttributeSet set) {
+        super(context, set);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        Log.i("PdfViewer", "onDetachedFromWindow");
+        enableRecycle = false;
+        super.onDetachedFromWindow();
+        enableRecycle = true;
+    }
+
+    @Override
+    public void recycle() {
+        if (enableRecycle) {
+            super.recycle();
+        }
+    }
+}
+
 public class FlutterPDFView implements PlatformView, MethodCallHandler {
     private final PDFView pdfView;
     private final MethodChannel methodChannel;
@@ -30,7 +54,7 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
 
     @SuppressWarnings("unchecked")
     FlutterPDFView(Context context, BinaryMessenger messenger, int id, Map<String, Object> params) {
-        pdfView = new PDFView(context, null);
+        pdfView = new CustomPDFView(context, null);
         final boolean preventLinkNavigation = getBoolean(params, "preventLinkNavigation");
 
         methodChannel = new MethodChannel(messenger, "plugins.endigo.io/pdfview_" + id);

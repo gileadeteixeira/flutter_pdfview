@@ -4,6 +4,7 @@
 .packages
 .pub/
 .idea/
+.fvm/
 
 ios/.symlinks
 
